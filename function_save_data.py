@@ -19,12 +19,15 @@ def save_mysql(sql: str, parameter=None, host='127.0.0.1', port=3306, user='root
             with conn.cursor() as cursor:
                 # 第三步: 通过游标对象向数据库服务器发出SQL语句
                 # cursor.execute('SQL语句')
-                f1 = pool.submit(cursor.executemany, (sql, parameter))
+                cursor.executemany(sql, parameter)
+                # pool.submit(cursor.executemany, (sql, parameter))
+                # pool.map(cursor.executemany, (sql, parameter))
                 # 第四部: 通过链接对象提交事务
                 conn.commit()
                 print('新增部门成功')
     except pymysql.MySQLError as err:
         print(err)
+        print('数据库执行没有成功')
         conn.rollback()
     finally:
         # 第五步: 关闭连接释放资源
@@ -50,13 +53,14 @@ def get_mysql(sql: str, parameter=None, host='127.0.0.1', port=3306, user='root'
             # fetchall() ---> 抓取所有数据，嵌套元组
             # fetchmany(n) ---> 抓取n个数据，嵌套元组
             row = cursor.fetchall()  # 抓取出来是一个二维元组
+            print('查询数据成功')
             return row
 
     except pymysql.MySQLError as err:
         print(err)
+        print('查询失败')
         conn.rollback()
         return 0
     finally:
         # 第五步: 关闭连接释放资源
-        print('最后执行')
         conn.close()
