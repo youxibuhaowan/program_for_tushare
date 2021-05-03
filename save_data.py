@@ -309,31 +309,32 @@ def perfect_request(apiname, params, fields, sql):
 
 
 # 股票列表
-# stock_basic_data = perfect_request(stock_basic_api, stock_basic, stock_basic_fields, sql_save_stock_basic)
+stock_basic_data = perfect_request(stock_basic_api, stock_basic, stock_basic_fields, sql_save_stock_basic)
 # 还没有经过savedata
 
 # 在读取完股票列表之后，才进行下一步，因为下一步中需要股票列表的参数
-# time.sleep(10)
-# # 日线行情
-# daily_data = perfect_request(daily_api, daily, daily_fields, sql_save_daily)
-#
-# # 每日指标
-# dailybasic_data = perfect_request(daily_basic_api, daily_basic, daily_basic_fields, sql_save_daily_basic)
-#
-# # 同花顺概念板块列表
-# ths_index_data = perfect_request(ths_index_api, ths_index, ths_index_fields, sql_save_ths_index)
-#
-# # 同花顺概念板块行情
-# ths_daily_data = perfect_request(ths_daily_api, ths_daily, ths_daily_fields, sql_save_ths_daily)
-#
-# # 上证指数基本信息
-# 这个有问题
-# index_basic_data = perfect_request(index_basic_api, index_basic, index_basic_fields, sql_save_index_basic)
+time.sleep(10)
+# 日线行情
+daily_data = perfect_request(daily_api, daily, daily_fields, sql_save_daily)
 
-# # 上证指数日线行情
+# 每日指标
+dailybasic_data = perfect_request(daily_basic_api, daily_basic, daily_basic_fields, sql_save_daily_basic)
+
+# 同花顺概念板块列表
+ths_index_data = perfect_request(ths_index_api, ths_index, ths_index_fields, sql_save_ths_index)
+
+# 同花顺概念板块行情
+ths_daily_data = perfect_request(ths_daily_api, ths_daily, ths_daily_fields, sql_save_ths_daily)
+
+# 上证指数基本信息
+# 这个有问题
+index_basic_data = perfect_request(index_basic_api, index_basic, index_basic_fields, sql_save_index_basic)
+
+
+# 大盘指数每日指标
+index_dailybasic_data = perfect_request(index_dailybasic_api, index_dailybasic, index_dailybasic_fields,
+                                        sql_save_index_dailybasic)
+
+# 上证指数日线行情
 # 这个接口有问题
-# index_daily_data = perfect_request(index_daily_api, index_daily, index_daily_fields, sql_save_index_daily)
-#
-# # 大盘指数每日指标
-# index_dailybasic_data = perfect_request(index_dailybasic_api, index_dailybasic, index_dailybasic_fields,
-#                                         sql_save_index_dailybasic)
+index_daily_data = perfect_request(index_daily_api, index_daily, index_daily_fields, sql_save_index_daily)
