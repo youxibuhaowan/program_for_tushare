@@ -136,6 +136,7 @@ CREATE TABLE IF NOT EXISTS `tushare_for_ali`.`tb_ths_index`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 """
 
+# 创建表语句
 save_mysql(create_tb_daily)
 save_mysql(create_tb_daily_basic)
 save_mysql(create_tb_index_basic)
@@ -152,7 +153,9 @@ save_mysql(create_tb_ths_index)
 
 
 
-
+"""
+给表中传递数据
+"""
 
 # 股票列表
 stock_basic_api = "stock_basic"
@@ -202,15 +205,15 @@ ths_daily = {
 index_basic_api = "index_basic"
 index_basic_fields = "ts_code, name, market, publisher, category, base_date, base_point"
 index_basic = {
-    'market': "SSE"
+    'market': "SZSE, SSE"
 }
 
 # 上证指数日线行情、周线、月线
 index_daily_api = "index_daily"
 index_daily_fields = "ts_code, trade_date, open, close, high, low, change, pct_chg, vol, amount"
 index_daily = {
-    'ts_code': "",
-    "start_date": "19990101",
+    'ts_code': "399300.SZ",
+    "start_date": "20100101",
     "end_date": datetime.now().strftime('%Y%m%d')
 }
 
@@ -218,7 +221,8 @@ index_daily = {
 index_dailybasic_api = "index_dailybasic"
 index_dailybasic_fields = "ts_code, trade_date, total_mv, turnover_rate, pe, pb"
 index_dailybasic = {
-    "start_date": "20040101",
+    "ts_code": "399300.SZ",
+    "start_date": "20100101",
     "end_date": datetime.now().strftime('%Y%m%d')
 }
 
@@ -231,7 +235,9 @@ def get_data_from_tushare(apiname, params, fields):
         "params": params,
         "fields": fields
     }
+    print('正在请求')
     response = requests.post(url=url, json=json)
+    print('请求完成')
     print(response.json())
     list_result = []
     result = response.json()['data']['items']
@@ -268,12 +274,13 @@ sql_save_index_basic = "insert into `tb_index_basic`(`ts_code`, `name`,  `market
 # 上证指数日线行情 ts_code, trade_date, close, open, high, low, change, pct_chg,vol, amount
 sql_save_index_daily = "insert into `tb_index_daily`(`ts_code`, trade_date, `close`, `open`, `high`, `low`, `change`, `pct_chg`,vol, amount) values(%s" + ", %s" * 9 + ");"
 
-# 大盘指数每日指标 ts_code, trade_date, total_mv, float_mv, total_share, float_share, turnover_rate, turnover_rate_f, pe, pe_ttm, pb
-sql_save_index_dailybasic = "insert into `tb_index_dailybasic`(ts_code, trade_date, total_mv, float_mv, total_share, float_share, turnover_rate, turnover_rate_f, pe, pe_ttm, pb) values(%s" + ", %s" * 10 + ");"
+# 大盘指数每日指标 ts_code, trade_date, total_mv, turnover_rate, pe, pb
+sql_save_index_dailybasic = "insert into `tb_index_dailybasic`(`ts_code`, `trade_date`, `total_mv`, `turnover_rate`, `pe`, `pb`) values(%s" + ", %s" * 5 + ");"
 
 
 def perfect_request(apiname, params, fields, sql):
     if apiname == 'ths_daily':
+        print('111')
         count = 0
         list1 = get_mysql(sql_select_all_ths_tscode)
         for i in list1:
@@ -284,22 +291,21 @@ def perfect_request(apiname, params, fields, sql):
             params['ts_code'] = i[0]
             print(params)
             save_mysql(sql, get_data_from_tushare(apiname, params, fields))
-    elif apiname == 'index_daily_api':
-        list1 = get_mysql(sql_select_all_index_basic)
-        for i in list1:
-            params['ts_code'] = i[0]
-            print(params)
-            save_mysql(sql, get_data_from_tushare(apiname, params, fields))
-    elif 'ts_code' in params:
+        return 0
+    elif params in ['daily', 'daily_basic']:
         # 如果需要股票的代码，从数据库中查找
         list1 = get_mysql(sql_select_all_tscode)
+        print('222')
         for i in list1:
             print(i)
             params['ts_code'] = i[0]
             print(params)
             save_mysql(sql, get_data_from_tushare(apiname, params, fields))
+        return 2
     else:
+        print('333')
         save_mysql(sql, get_data_from_tushare(apiname, params, fields))
+        return 3
 
 
 # 股票列表
@@ -325,6 +331,7 @@ def perfect_request(apiname, params, fields, sql):
 # index_basic_data = perfect_request(index_basic_api, index_basic, index_basic_fields, sql_save_index_basic)
 
 # # 上证指数日线行情
+# 这个接口有问题
 # index_daily_data = perfect_request(index_daily_api, index_daily, index_daily_fields, sql_save_index_daily)
 #
 # # 大盘指数每日指标
